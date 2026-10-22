@@ -45,7 +45,7 @@ mkdir carpetaEjemplo
 ### 3\. Clona el repositorio
 
 ```powershell
-git clone <url-del-repositorio>
+git clone https://github.com/carolinamesacurso/proyecto_Albergues
 ```
 
 &nbsp;
