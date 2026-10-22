@@ -1,78 +1,112 @@
-# sales_sample
-Sales sample project
+# Albergues \--- PostgreSQL e Adminer con Docker Compose
 
-## 🚀 Guía de Inicio Rápido
+Este proyecto trata de levantantar con contendores una estructura con varios servicios para poder trabajar con la base de datos Albergues.
 
-Sigue estes pasos para configurar e executar o proxecto no teu contorno local.
+Para esto utilizaremos las imágenes de postgressql y Adminer , las cuales nos dejarán tratar y visualizar la base de datos por una url .
 
-### 1. Clonar o repositorio
+## Estrutura do proxecto
 
-```bash
-git clone https://github.com/bigdatawirtz/sales_sample.git
-cd sales_sample
+.
+
+├── compose.yml
+
+├── .env.example
+
+├── .gitignore
+
+├── .env   #no se sube al repositorio              
+
+└── initdb/
+
+&nbsp;&nbsp;&nbsp;&nbsp;├── 01\_tablas.sql  
+
+&nbsp;&nbsp;&nbsp;&nbsp;└── 02\_datos.sql 
+
+## Requisitos
+
+- Docker desktop instalado.
+
+## Como arrancar o proxecto paso a paso
+
+### 1\. Clonar el poryecto (ubuntu)
+
+Crea una estructura de subcarpetas donde se pueda clonar el repositorio con los siguientes comandos:
+
+mkdir carpetaEjemplo
+
+&nbsp;
+
+### 2\. Crea el enviroment y actívalo
+
+&nbsp;python3 \-m venv .venv
+
+&nbsp;source .venv/bin/activate
+
+### 3\. Clona el repositorio
+
+```powershell
+git clone <url-del-repositorio>
 ```
 
----
+&nbsp;
 
-### 2. Crear e activar o contorno virtual
+Configura los valores reales de las variables en el archivo .env .
 
-**En Linux:**
-```bash
-python3 -m venv .venv
-source .venv/bin/activate
+***1-*** Realiza un 'code .' para poder abrir el proyecto en visual studio
+
+***2-*** El proyecto te proporcionará un '.env.example' el cual tendrás que copiar para crear el fichero '.env' donde realizaremos los siguientes pasos.
+
+```dotenv
+Modifica estas variables en '.env' para configurar el usuario , contraseña y base de datos a utilizar
+
+POSTGRES_USER=***
+POSTGRES_PASSWORD=***
+POSTGRES_DB=***
 ```
 
+&nbsp;
 
----
+### 4\. Levantar los servicios
 
-### 3. Instalar as dependencias
+docker compose up
 
-Co contorno virtual activo, instala os paquetes necesarios:
+Los ficheiros compatibles de `initdb/` se ejecutan automaticamente en orden solo cuando los volumenes no estaban incializados. Localización de los scripts en /initdb:
 
-```bash
-pip install --upgrade pip
-pip install -r requirements.txt
-```
+1. `01_tablas.sql` crea la tabla `albergues`.  
+2. `02_datos.sql` añade 8 registros.
 
----
+### 5\. Acceder al Adminer para trabajara con la base de datos
 
-### 4. Executar o código Python
+Con la siguiente url se incia sesión para poder trabajar con los contenedores [http\://localhost:8080](http://localhost:8080):
 
-Para lanzar o script principal situado na carpeta `src`:
+Servidor ,Usurio, Contraseña : Valores que están guardados en .env
 
-```bash
-# Tarefa 1
-python src/tarefa1.py
-# Tarefa 2
-python src/tarefa2.py
-```
+## Prueba de persistencia
 
----
+En esta parte realizamos una prueba donde se comprueba los resultados de cada uno de los siguientes pasos:
 
-### 5. Levantar a infraestrutura con base de datos usando Docker-Compose
+***1 \-*** docker compose up \-d : Inicializamos el proyecto con sus contenedores en base a las imágenes
 
-Para iniciar os servizos definidos en `docker-compose.yml`:
+***2 \-*** Insertamos un nuevo albergue : Al volver a visualizar el contenido lo vemos reflejado con los anteriores caminos
 
-```bash
-docker compose up -d
-```
+&nbsp;INSERT INTO albergues
 
-Para deter os servizos cando remates:
+&nbsp;&nbsp;&nbsp;&nbsp;(identificador, nome, concello, camino, num\_prazas, prezo\_noite)
 
-```bash
-docker compose down
-```
+VALUES
 
----
+&nbsp;&nbsp;&nbsp;&nbsp;(9, 'Albergue de prueba de persistencia', 'prueba', 'persistencia', 40, 15.00);
 
-### 6. Executar o código SQL dentro do contedor
+***3-*** docker compose down y docker compose up \-d :
 
-Para executar a carga de datos e consultas no servidor SQL
+En el primer comando eliminamos solo los contenedores. En el segundo lso levantamos y visualizamos de nuevo nuestros datos ya guardados en las tablas correspondientes
 
+***4-*** docker compose down \-v e docker compose up \-d
 
-```bash
-# Tarefa 1: carga os datos + executa consultas 
-docker exec mysql-vendas sh -c 'mysql -uroot -pbigdata vendas < /sql/tarefa1.sql'
-# Tarefa 2
-docker exec mysql-vendas sh -c 'mysql -uroot -pbigdata vendas < /sql/tarefa2.sql'
-```
+Con estos comando comprobamos que al añadir la parte del comando '-v' estamos indicando que vamso a eliminar los volumenes creados con anterioridad en la siguiente ruta :
+
+volumes:
+
+&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;\- postgres\_data:/var/lib/postgresql/data
+
+Al volver a levantar los contenedores observamos que al no insertar nuestro albergue de prueba en el script este ha dejado de visualizarse en la tabla , es decir , lo tendríamos que volver a crear ya que las tablas han dejado de existir.
