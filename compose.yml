@@ -21,7 +21,7 @@ services:
       start_period: 10s
 
   adminer:
-    image: adminer
+    image: adminer:4
     container_name: adminer
     restart: unless-stopped
     ports:
